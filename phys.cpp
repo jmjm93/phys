@@ -22,8 +22,9 @@ using namespace glm;
 
 #include "world.hpp"
 
-// lists shouldn't be used for performance purposes
 std::list<asset> world;
+
+// lists shouldn't be used for performance purposes
 
 
 
@@ -101,32 +102,11 @@ int main( void )
 	const int height = 100;
 	const int width =100;  // BORDERS: [0,0] [0,100] [100,0] [100,100]
 	// array of ground vertices
-	GLfloat ans[height*width*3*6] = {0.0f};
+	GLfloat ans[height*width*3*4] ={0.0f};
 	int i = 0;
 	// generates the world
-	for (int row = 0; row < height; row++)
-	{
-		for (int col = 0; col < width; col++)
-		{
-			ans[i] = xOffset + col; ans[i + 1] = -5.0f; ans[i + 2] = zOffset + row;
-			i += 3;
-			ans[i] = xOffset + col + 1; ans[i + 1] = -5.0f; ans[i + 2] = zOffset + row;
-			i += 3;
-			ans[i] = xOffset + col + 1; ans[i + 1] = -5.0f; ans[i + 2] = zOffset + row + 1;
-			i += 3; 
-			ans[i] = xOffset + col; ans[i + 1] = -5.0f; ans[i + 2] = zOffset + row + 1;
-			i += 3;
-
-		}
-	}
-
-	// the coordinates for the position and normal of the ground plane, to be used for collision calculation
-	// the position may become inaccurate since the world moves together with the user, but it doesn't really matter anyway for the ground since it's practically an endless plane, it has no true center
-	asset ground;
-	ground.position = glm::vec3(50.0f,-5.0f,50.0f);
-	ground.normal = glm::vec3(0.0f,1.0f,0.0f);	
+	asset ground = generateGround(width,height,xOffset,zOffset,ans);
 	world.push_front(ground);
-	// the collision system is through ray projection, which means that for every direction the user might move the collision should be calculated, this means that at least 10 rays should be set (jump, fall, and diagonal, straight/strafe movements), only the fall ray (towards the bottom of the world) is initialized
 
 
 	GLuint vertexbuffer;
@@ -137,7 +117,7 @@ int main( void )
 	glBufferDataARB(GL_ARRAY_BUFFER, sizeof(ans), ans, GL_DYNAMIC_DRAW);
 	
 	// initial pos
-	glm::vec3 pos = glm::vec3(0.0f, 0.7f, 0.0f);
+	glm::vec3 pos = glm::vec3(0.0f, 5.0f, 0.0f);
 	int fps = 0;
 	bool needRefresh = false;
 	// eternal loop as long as the user doesn't press escape
@@ -168,41 +148,7 @@ int main( void )
 		//	fprintf(stderr, "SPEED %f,%f,%f\n ", speed.x, speed.y, speed.z);
 		//	fprintf(stderr, "DIRECTION %f,%f,%f\n ", dir.x, dir.y, dir.z);
 		}
-
-		if (pos.x - xOffset > 60) {
-			xOffset += 10;
-			needRefresh = true;
-			}
-		else if (pos.x - xOffset < 40) {
-				xOffset -= 10;
-				needRefresh = true;
-			}
-		if (pos.z - zOffset > 60) {
-			zOffset += 10;
-			needRefresh = true;
-		}
-		else if (pos.z - zOffset < 40) {
-			zOffset -= 10;
-			needRefresh = true;
-		}
-		int i = 0;
-		if (needRefresh) {
-			for (int row = 0; row < height; row++)
-			{
-				for (int col = 0; col < width; col++)
-				{
-					ans[i] = xOffset + col; ans[i + 1] = -5.0f; ans[i + 2] = zOffset + row;
-					i += 3;
-					ans[i] = xOffset + col + 1; ans[i + 1] = -5.0f; ans[i + 2] = zOffset + row;
-					i += 3; 
-					ans[i] = xOffset + col; ans[i + 1] = -5.0f; ans[i + 2] = zOffset + row;
-					i += 3;
-					ans[i] = xOffset + col; ans[i + 1] = -5.0f; ans[i + 2] = zOffset + row + 1;
-					i += 3;
-				}
-			}
-			needRefresh = false;
-		}
+		updateGround(pos,ans);
 		glBufferDataARB(GL_ARRAY_BUFFER, sizeof(ans), ans, GL_DYNAMIC_DRAW);
 		// Send our transformation to the currently bound shader, 
 		// in the "MVP" uniform

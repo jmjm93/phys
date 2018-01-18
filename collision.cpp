@@ -61,10 +61,8 @@ int calculateIntersectionPlane(glm::vec3 planenormal, glm::vec3 planeposition, g
 
 
 
-int asdf=0;
 void runProjections(glm::vec3 pos, glm::vec3 dir, std::list<asset> world)
 {
-	asdf++;
 	glm::vec3 _front = dir;
 	glm::vec3 _back = dir*glm::vec3(-1.0f,1.0f,-1.0f);
 	glm::vec3 _left = glm::cross(dir,glm::vec3(0.0f,-1.0f,0.0f));
@@ -74,7 +72,6 @@ void runProjections(glm::vec3 pos, glm::vec3 dir, std::list<asset> world)
 	it != world.end();
 	it++)
 	{
-		if(asdf%100==0) fprintf(stderr,"normal plane %f,%f,%f\n",(*it).normal.x,(*it).normal.y,(*it).normal.z);
 		double lambda, alpha;
 		calculateIntersectionPlane((*it).normal,(*it).position, pos, _down, lambda, alpha);	
 		if(lambda < 0.7 && lambda > 0){
