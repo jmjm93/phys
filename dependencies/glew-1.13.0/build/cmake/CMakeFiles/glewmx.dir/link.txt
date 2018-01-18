@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC -O3 -DNDEBUG  -shared -Wl,-soname,libGLEWmx.so -o lib/libGLEWmx.so CMakeFiles/glewmx.dir/home/jmjm/Desktop/openglc++/external/glew-1.13.0/src/glew.o -lGLU -lGL 

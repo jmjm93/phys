@@ -1,0 +1,2 @@
+/usr/bin/ar qc lib/libGLEWmx.a  CMakeFiles/glewmx_s.dir/home/jmjm/Desktop/openglc++/external/glew-1.13.0/src/glew.o
+/usr/bin/ranlib lib/libGLEWmx.a

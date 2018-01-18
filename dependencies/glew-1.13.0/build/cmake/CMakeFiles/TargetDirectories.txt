@@ -1,0 +1,12 @@
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/install.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/glewmx_s.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/glew_s.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/rebuild_cache.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/glewmx.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/glew.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/visualinfo.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/list_install_components.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/glewinfo.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/install/strip.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/install/local.dir
+/home/jmjm/Desktop/openglc++/external/glew-1.13.0/build/cmake/CMakeFiles/edit_cache.dir
