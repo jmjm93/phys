@@ -1,6 +1,7 @@
 // Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
+#include <list>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -17,50 +18,13 @@ using namespace glm;
 #include "shader.hpp"
 //#include "common/texture.hpp"
 #include "controls.hpp"
+#include "collision.hpp"
 
-glm::vec3 rayDown;
+#include "world.hpp"
 
+// lists shouldn't be used for performance purposes
+std::list<asset> world;
 
-double dotProduct(glm::vec3 a, glm::vec3 b)
-{
-	return a.x*b.x + a.y*b.y + a.z*b.z;
-}
-
-double modulus(glm::vec3 a)
-{
-	return sqrt(pow(a.x, 2) + pow(a.y, 2) + pow(a.z, 2));
-}
-
-// calculates the distance towards a collision between the user and a plane, planenormal and planeposition being the normal vector and position of the plane, position and direction being the position and direction vectors of the mobile user
-// the return value will be 0 if there won't be any collision ever, 1 if otherwise, and the distance will be stored on lambda
-int calculateIntersectionPlane(glm::vec3 planenormal, glm::vec3 planeposition, glm::vec3 position, glm::vec3 direction, double& lambda, double& alpha)
-{
-	double DotProduct = dotProduct(direction, planenormal);
-	double l2;
-
-	
-	if ((DotProduct < 1.0e-8) && (DotProduct > -1.0e-8)) return 0;
-	l2 = dotProduct(planenormal, planeposition - position) / DotProduct;
-	if (l2 < -1.0e-8) return 0;
-	glm::vec3 length = position - planeposition;
-	//double lenmod = sqrt(pow(length.x, 2) + pow(length.y, 2) + pow(length.z, 2));
-	lambda = l2;
-	alpha = -1;
-	// TODO: ray projection to calculate the exact coordinates of the collision
-/*	//lambda = modulus(position-planeposition);
-	if (l2 < 10) {
-		glm::vec3 rayProjection = position;
-		double lastDistance = modulus(planeposition - rayProjection);
-		while (modulus(planeposition - rayProjection) <= lastDistance)
-		{
-			lastDistance = modulus(planeposition - rayProjection);
-			rayProjection += direction;
-		}
-		l2 = lastDistance;
-		alpha = l2;
-	} */
-	return 1;
-}
 
 
 int main( void )
@@ -81,7 +45,7 @@ int main( void )
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow( 1024, 768, "Physics Engine test", NULL, NULL);
-	setWindow(window);
+	setWindow(window);	
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		getchar();
@@ -157,10 +121,12 @@ int main( void )
 	}
 
 	// the coordinates for the position and normal of the ground plane, to be used for collision calculation
-	glm::vec3 planeposition = glm::vec3(50.0f, -5.0f, 50.0f);
-	glm::vec3 planenormal = glm::vec3(0.0f, 1.0f, 0.0f);
-	// initialization for the downward ray
-	rayDown = glm::vec3(0.0f, -1.0f, 0.0f);
+	// the position may become inaccurate since the world moves together with the user, but it doesn't really matter anyway for the ground since it's practically an endless plane, it has no true center
+	asset ground;
+	ground.position = glm::vec3(50.0f,-5.0f,50.0f);
+	ground.normal = glm::vec3(0.0f,1.0f,0.0f);	
+	world.push_front(ground);
+	// the collision system is through ray projection, which means that for every direction the user might move the collision should be calculated, this means that at least 10 rays should be set (jump, fall, and diagonal, straight/strafe movements), only the fall ray (towards the bottom of the world) is initialized
 
 
 	GLuint vertexbuffer;
@@ -194,26 +160,19 @@ int main( void )
 		glm::vec3 dir = getCurrentDirection();
 		fps++;
 		glm::vec3 speed = getCurrentSpeed();
-		
+	
 
-		stop_collision_down;
-		GLfloat anscol;
-		double downalpha;
-		double len;
-		anscol = calculateIntersectionPlane(planenormal, planeposition, pos, rayDown, len, downalpha);
-		if (len < 0.7 && len > 0) {
-			set_collision_down(1, planenormal);
-		}
-		if (fps % 600 == 0) {
-			fprintf(stderr, "POSITION %f,%f,%f\n ", pos.x, pos.y, pos.z);
-			fprintf(stderr, "SPEED %f,%f,%f\n ", speed.x, speed.y, speed.z);
-			fprintf(stderr, "%f, %d\n", len, anscol);
+		runProjections(pos,dir,world);	
+		if (fps % 150 == 0) {
+		//	fprintf(stderr, "POSITION %f,%f,%f\n ", pos.x, pos.y, pos.z);
+		//	fprintf(stderr, "SPEED %f,%f,%f\n ", speed.x, speed.y, speed.z);
+		//	fprintf(stderr, "DIRECTION %f,%f,%f\n ", dir.x, dir.y, dir.z);
 		}
 
 		if (pos.x - xOffset > 60) {
 			xOffset += 10;
 			needRefresh = true;
-		}
+			}
 		else if (pos.x - xOffset < 40) {
 				xOffset -= 10;
 				needRefresh = true;
