@@ -1,7 +1,7 @@
 // Include GLFW
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-extern GLFWwindow* window; // The "extern" keyword here is to access the variable "window" declared in tutorialXXX.cpp. This is a hack to keep the tutorials simple. Please avoid this.
+GLFWwindow* _window;
 
 // Include GLM
 #include <glm/glm.hpp>
@@ -67,7 +67,6 @@ void set_collision_right(int coll, glm::vec3 norm)
 	collision_normal = norm;
 	collision_right_detected = coll;
 }
-
 void stop_collision_right()
 {
 	collision_right_detected = 0;
@@ -114,6 +113,14 @@ glm::vec3 getCurrentDirection() {
 	return direction;
 }
 
+
+void setWindow(GLFWwindow* win)
+{
+	_window = win;
+}
+
+
+
 void computeMatricesFromInputs(){
 
 	// glfwGetTime is called only once, the first time this function is called
@@ -125,10 +132,10 @@ void computeMatricesFromInputs(){
 
 	// Get mouse position
 	double xpos, ypos;
-	glfwGetCursorPos(window, &xpos, &ypos);
+	glfwGetCursorPos(_window, &xpos, &ypos);
 
 	// Reset mouse position for next frame
-	glfwSetCursorPos(window, 1024/2, 768/2);
+	glfwSetCursorPos(_window, 1024/2, 768/2);
 
 	// Compute new orientation
 	horizontalAngle += mouseSpeed * float(1024/2 - xpos );
@@ -151,7 +158,7 @@ void computeMatricesFromInputs(){
 	// Up vector
 	glm::vec3 up = glm::cross( right, direction );
 	// Move forward
-	if (glfwGetKey( window, GLFW_KEY_W ) == GLFW_PRESS){
+	if (glfwGetKey( _window, GLFW_KEY_W ) == GLFW_PRESS){
 		
 		/*position.x += direction.x * deltaTime * movSpeed.x;
 		position.y += direction.y * deltaTime * movSpeed.y;
@@ -173,7 +180,7 @@ void computeMatricesFromInputs(){
 			}*/
 		}
 	// Move backward
-	if (glfwGetKey( window, GLFW_KEY_S ) == GLFW_PRESS){
+	if (glfwGetKey( _window, GLFW_KEY_S ) == GLFW_PRESS){
 	/*	position.x -= direction.x * deltaTime * movSpeed.x;
 		position.y -= direction.y * deltaTime * movSpeed.y;
 		position.z -= direction.z * deltaTime * movSpeed.z;
@@ -194,7 +201,7 @@ void computeMatricesFromInputs(){
 		}*/
 	}
 	// Strafe right
-	if (glfwGetKey( window, GLFW_KEY_D ) == GLFW_PRESS){
+	if (glfwGetKey( _window, GLFW_KEY_D ) == GLFW_PRESS){
 	/*	position.x += right.x * deltaTime * movSpeed.x;
 		position.y += right.y * deltaTime * movSpeed.y;
 		position.z += right.z * deltaTime * movSpeed.z;
@@ -208,7 +215,7 @@ void computeMatricesFromInputs(){
 		}
 	}
 	// Strafe left
-	if (glfwGetKey( window, GLFW_KEY_A ) == GLFW_PRESS){
+	if (glfwGetKey( _window, GLFW_KEY_A ) == GLFW_PRESS){
 /*		position.x -= right.x * deltaTime * movSpeed.x;
 		position.y -= right.y * deltaTime * movSpeed.y;
 		position.z -= right.z * deltaTime * movSpeed.z;
@@ -221,12 +228,12 @@ void computeMatricesFromInputs(){
 			movSpeed += collision_normal*right * deltaTime * accelSpeed;
 		}
 	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !jumping && collision_down_detected) {
+	if (glfwGetKey(_window, GLFW_KEY_SPACE) == GLFW_PRESS && !jumping && collision_down_detected) {
 	/*	position.y += deltaTime * movSpeed.y * 5; */
 		movSpeed.y += deltaTime * accelSpeed.y;
 		jumping = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE) jumping = false;
+	if (glfwGetKey(_window, GLFW_KEY_SPACE) == GLFW_RELEASE) jumping = false;
 	if (!collision_down_detected) {
 		movSpeed.y -= gravity * 0.5f * deltaTime;
 	}
